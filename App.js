@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { Text, View, StyleSheet, TextInput } from 'react-native'
+import { Text, View, StyleSheet } from 'react-native'
 import { Constants } from 'expo'
-import { SuggesterProvider, SuggestTextInput } from 'react-native-suggester'
+import { SuggesterProvider, SuggestTextInput } from './src'
 
 const DATA = [
   { id: 1, value: 'Honda' },
@@ -20,17 +20,17 @@ export default class App extends React.Component {
       <SuggesterProvider>
         <View style={styles.container}>
           <Text>Hello World</Text>
-          <SuggestTextInput data={DATA} style={styles.input} />
+          <SuggestTextInput name="field1" data={DATA} style={styles.input} />
           <Text>Hello World</Text>
           <Text>Hello World</Text>
           <Text>Hello World</Text>
           <Text>Hello World</Text>
-          <SuggestTextInput data={DATA} style={styles.input} />
+          <SuggestTextInput name="field2" data={DATA} style={styles.input} />
           <Text>Hello World</Text>
           <Text>Hello World</Text>
           <Text>Hello World</Text>
           <Text>Hello World</Text>
-          <SuggestTextInput data={DATA} style={styles.input} />
+          <SuggestTextInput name="field3" data={DATA} style={styles.input} />
         </View>
       </SuggesterProvider>
     )

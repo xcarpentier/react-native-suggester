@@ -10,3 +10,5 @@ example/node_modules/
 .expo/
 npm-debug.log
 lib/
+yarn-error.log
+example/yarn-error.log

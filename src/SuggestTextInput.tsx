@@ -6,21 +6,21 @@ import {
   TextInput,
   TextInputProps,
   Animated,
+  NativeSyntheticEvent,
+  TextInputFocusEventData,
 } from 'react-native'
 import { SuggesterContext, SuggesterContextParam } from './SuggesterContext'
-import { DURATION } from './Constants'
+import { DURATION, WINDOW_HEIGHT, WINDOW_WIDTH } from './Constants'
 import { IData } from './IData'
 
 interface Props extends TextInputProps {
   data: IData[]
+  name: string
 }
 
-interface State {
-  value?: string
-}
-
-export class SuggestTextInput extends Component<Props, State> {
+export class SuggestTextInput extends Component<Props> {
   static propTypes = {
+    name: PropTypes.string.isRequired,
     data: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
@@ -29,7 +29,6 @@ export class SuggestTextInput extends Component<Props, State> {
       }).isRequired,
     ),
   }
-  state = { value: '' }
 
   translateY = new Animated.Value(0)
 
@@ -47,13 +46,25 @@ export class SuggestTextInput extends Component<Props, State> {
     handleFocusProvider,
     setDataAsync,
     statusBarHeight,
-  }: SuggesterContextParam) => async () => {
-    const { data } = this.props
-    const { inputY, inputHeight } = await this.measureAsync(this.textInputRef)
+    setPaddingHorizontalAsync,
+  }: SuggesterContextParam) => async (
+    e: NativeSyntheticEvent<TextInputFocusEventData>,
+  ) => {
+    const { onFocus } = this.props
+    if (onFocus) {
+      onFocus(e)
+    }
 
-    await setDataAsync!(data)
+    const { name, data } = this.props
+    const { inputY, inputHeight, inputWidth } = await this.measureAsync(
+      this.textInputRef,
+    )
+
+    await setDataAsync!(name, data)
 
     await setMarginTopAsync!(inputHeight)
+
+    await setPaddingHorizontalAsync!((WINDOW_WIDTH - inputWidth) / 2)
 
     handleFocusProvider!()
 
@@ -73,7 +84,13 @@ export class SuggestTextInput extends Component<Props, State> {
     ]).start()
   }
 
-  handleBlur = ({ handleBlurProvider }: SuggesterContextParam) => () => {
+  handleBlur = ({ handleBlurProvider }: SuggesterContextParam) => (
+    e: NativeSyntheticEvent<TextInputFocusEventData>,
+  ) => {
+    const { onBlur } = this.props
+    if (onBlur) {
+      onBlur(e)
+    }
     handleBlurProvider!()
     Animated.parallel([
       Animated.timing(this.translateY, {
@@ -95,7 +112,15 @@ export class SuggestTextInput extends Component<Props, State> {
     })
   }
 
-  handleChange = (value: string) => this.setState({ value })
+  handleChange = ({ setValueAsync }: SuggesterContextParam) => (
+    value: string,
+  ) => {
+    const { name, onChangeText } = this.props
+    if (onChangeText) {
+      onChangeText(value)
+    }
+    setValueAsync!(name, value)
+  }
 
   measureAsync = (
     ref?: RefObject<TextInput>,
@@ -117,21 +142,24 @@ export class SuggestTextInput extends Component<Props, State> {
     })
 
   render() {
-    const { value } = this.state
     const { translateY, opacity } = this
     return (
       <SuggesterContext.Consumer>
         {({
+          values,
           setMarginTopAsync,
           handleFocusProvider,
           handleBlurProvider,
           setDataAsync,
           statusBarHeight,
+          backgroundColor,
+          setValueAsync,
+          setPaddingHorizontalAsync,
         }) => (
           <>
             <Animated.View
               style={{
-                backgroundColor: '#fff',
+                backgroundColor,
                 transform: [{ translateY }],
                 zIndex: 2,
               }}
@@ -140,13 +168,14 @@ export class SuggestTextInput extends Component<Props, State> {
                 autoCorrect={false}
                 {...this.props}
                 ref={this.textInputRef}
-                value={value}
-                onChangeText={this.handleChange}
+                value={values![this.props.name]}
+                onChangeText={this.handleChange({ setValueAsync })}
                 onFocus={this.handleFocus({
                   setMarginTopAsync,
                   handleFocusProvider,
                   setDataAsync,
                   statusBarHeight,
+                  setPaddingHorizontalAsync,
                 })}
                 onBlur={this.handleBlur({ handleBlurProvider })}
               />
@@ -154,7 +183,7 @@ export class SuggestTextInput extends Component<Props, State> {
             <Animated.View
               style={{
                 ...StyleSheet.absoluteFillObject,
-                backgroundColor: '#fff',
+                backgroundColor,
                 opacity,
                 zIndex: 1,
               }}

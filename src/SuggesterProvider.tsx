@@ -1,21 +1,25 @@
 import React, { Component, ReactNode } from 'react'
 import { SuggesterContext } from './SuggesterContext'
 import { StyleSheet, Easing, Animated } from 'react-native'
-import { InputFilterModal } from './SuggesterModal'
+import { SuggesterModal } from './SuggesterModal'
 import { DURATION, WINDOW_HEIGHT, STATUS_BAR_HEIGHT } from './Constants'
 import { setStateAsync } from './SetStateAsync'
 import { IData } from './IData'
+import Fuse from 'fuse.js'
 
 interface Props {
   children: ReactNode
   statusBarHeight?: number
   backgroundColor?: string
+  textWhenEmpty?: string
 }
 
 interface State {
   data: IData[]
+  currentName?: string
   marginTop: number
-  value: string
+  paddingHorizontal: number
+  values: { [name: string]: string }
 }
 
 export class SuggesterProvider extends Component<Props, State> {
@@ -26,24 +30,40 @@ export class SuggesterProvider extends Component<Props, State> {
 
   state = {
     data: [],
+    currentName: undefined,
     marginTop: 30,
-    value: '',
+    paddingHorizontal: 15,
+    values: {},
   }
 
   translateY = new Animated.Value(WINDOW_HEIGHT)
 
-  setDataAsync = (data: IData[]) =>
-    setStateAsync({ component: this, state: { data } })
+  fuse?: Fuse<IData>
 
-  setValueAsync = (value: string) =>
-    setStateAsync({ component: this, state: { value } })
+  setDataAsync = async (name: string, data: IData[]) => {
+    await setStateAsync({ component: this, state: { data, currentName: name } })
+    this.fuse = new Fuse(data, {
+      shouldSort: true,
+      threshold: 0.6,
+      location: 0,
+      distance: 100,
+      maxPatternLength: 32,
+      minMatchCharLength: 1,
+      keys: ['value'],
+    })
+  }
+
+  setValueAsync = (name: string, value: string) =>
+    setStateAsync({
+      component: this,
+      state: { values: { ...this.state.values, [name]: value } },
+    })
 
   setMarginTopAsync = (marginTop: number) =>
     setStateAsync({ component: this, state: { marginTop } })
 
   handleFocus = () => {
     const { marginTop } = this.state
-    this.setValueAsync('')
     Animated.timing(this.translateY, {
       toValue: marginTop + this.props.statusBarHeight!,
       duration: DURATION,
@@ -61,11 +81,27 @@ export class SuggesterProvider extends Component<Props, State> {
     }).start()
   }
 
-  selectFromList = (value: string) => this.setValueAsync(value)
+  selectFromList = (name: string, value: string) =>
+    this.setValueAsync(name, value)
+
+  getData = () => {
+    const { values, currentName } = this.state
+    return this.fuse && currentName
+      ? this.fuse!.search(values[currentName!])
+      : []
+  }
+
+  setPaddingHorizontalAsync = (paddingHorizontal: number) =>
+    setStateAsync({ component: this, state: { paddingHorizontal } })
 
   render() {
-    const { children, backgroundColor, statusBarHeight } = this.props
-    const { data, value } = this.state
+    const {
+      children,
+      backgroundColor,
+      statusBarHeight,
+      textWhenEmpty,
+    } = this.props
+    const { values, currentName, paddingHorizontal } = this.state
     const {
       setDataAsync,
       setMarginTopAsync,
@@ -73,18 +109,22 @@ export class SuggesterProvider extends Component<Props, State> {
       handleFocus: handleFocusProvider,
       handleBlur: handleBlurProvider,
       translateY,
+      setValueAsync,
+      setPaddingHorizontalAsync,
     } = this
 
     return (
       <SuggesterContext.Provider
         value={{
-          data,
-          value,
+          backgroundColor,
+          statusBarHeight,
+          values,
           setDataAsync,
           setMarginTopAsync,
+          setValueAsync,
           handleFocusProvider,
           handleBlurProvider,
-          statusBarHeight,
+          setPaddingHorizontalAsync,
         }}
       >
         {children}
@@ -95,7 +135,16 @@ export class SuggesterProvider extends Component<Props, State> {
             transform: [{ translateY }],
           }}
         >
-          <InputFilterModal {...{ data, selectFromList }} />
+          <SuggesterModal
+            {...{
+              data: this.getData(),
+              selectFromList,
+              textWhenEmpty,
+              backgroundColor,
+              currentName,
+              paddingHorizontal,
+            }}
+          />
         </Animated.View>
       </SuggesterContext.Provider>
     )

@@ -8,24 +8,41 @@ import {
 } from 'react-native'
 import { IData } from './IData'
 
-export interface Props {
+interface Props {
   data: IData[]
-  selectFromList(value: string): void
+  currentName?: string
+  textWhenEmpty?: string
+  backgroundColor?: string
+  paddingHorizontal?: number
+  selectFromList(name: string, value: string): void
 }
 
-export class InputFilterModal extends Component<Props> {
+const styles = StyleSheet.create({
+  item: {
+    flex: 1,
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    paddingVertical: 7,
+  },
+  empty: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+  },
+})
+
+export class SuggesterModal extends Component<Props> {
+  static defaultProps = {
+    textWhenEmpty: 'Type text, we suggest',
+    backgroundColor: 'white',
+  }
   keyExtractor = (item: { id: string | number }) => `${item.id}`
 
   renderEmpty = () => (
     <View
-      style={{
-        alignItems: 'center',
-        backgroundColor: 'blue',
-        flex: 1,
-        justifyContent: 'center',
-      }}
+      style={[styles.empty, { backgroundColor: this.props.backgroundColor }]}
     >
-      <Text>{'Type text we suggest'}</Text>
+      <Text>{this.props.textWhenEmpty}</Text>
     </View>
   )
 
@@ -33,19 +50,17 @@ export class InputFilterModal extends Component<Props> {
     item,
   }: {
     item: IData
-  }) => (
-    <TouchableOpacity
-      onPress={() => selectFromList(item.value)}
-      style={{
-        backgroundColor: '#fff',
-        height: 30,
-        paddingHorizontal: 15,
-        width: '100%',
-      }}
-    >
-      <Text>{item.value}</Text>
-    </TouchableOpacity>
-  )
+  }) => {
+    const { backgroundColor, paddingHorizontal } = this.props
+    return (
+      <TouchableOpacity
+        onPress={() => selectFromList(this.props.currentName!, item.value)}
+        style={[styles.item, { backgroundColor, paddingHorizontal }]}
+      >
+        <Text>{item.value}</Text>
+      </TouchableOpacity>
+    )
+  }
 
   render() {
     const { data, selectFromList } = this.props

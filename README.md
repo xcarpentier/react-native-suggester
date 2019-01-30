@@ -25,7 +25,7 @@ export default class App extends React.Component {
     return (
       <SuggesterProvider>
         {/* somewhere in your app */}
-        <SuggestTextInput data={DATA} style={styles.input} />
+        <SuggestTextInput name="field1" data={DATA} style={styles.input} />
       </SuggesterProvider>
     )
   }
