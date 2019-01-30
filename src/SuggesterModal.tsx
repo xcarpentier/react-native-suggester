@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { IData } from 'IData'
 import {
   FlatList,
   StyleSheet,
@@ -7,6 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import { IData } from './IData'
 
 export interface Props {
   data: IData[]

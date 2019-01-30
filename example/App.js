@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { Text, View, StyleSheet, TextInput } from 'react-native'
 import { Constants } from 'expo'
-import { InputFilterProvider } from './InputFilterProvider'
-import { InputFilterWrapper } from './InputFilterWrapper'
+import { SuggesterProvider, SuggestTextInput } from 'react-native-suggester'
 
 const DATA = [
   { id: 1, value: 'Honda' },
@@ -18,28 +17,22 @@ const DATA = [
 export default class App extends React.Component {
   render() {
     return (
-      <InputFilterProvider>
+      <SuggesterProvider>
         <View style={styles.container}>
           <Text>Hello World</Text>
-          <InputFilterWrapper data={DATA}>
-            <TextInput style={styles.input} />
-          </InputFilterWrapper>
+          <SuggestTextInput data={DATA} style={styles.input} />
           <Text>Hello World</Text>
           <Text>Hello World</Text>
           <Text>Hello World</Text>
           <Text>Hello World</Text>
-          <InputFilterWrapper data={DATA}>
-            <TextInput style={styles.input} />
-          </InputFilterWrapper>
+          <SuggestTextInput data={DATA} style={styles.input} />
           <Text>Hello World</Text>
           <Text>Hello World</Text>
           <Text>Hello World</Text>
           <Text>Hello World</Text>
-          <InputFilterWrapper data={DATA}>
-            <TextInput style={styles.input} placeholder={'marque'} />
-          </InputFilterWrapper>
+          <SuggestTextInput data={DATA} style={styles.input} />
         </View>
-      </InputFilterProvider>
+      </SuggesterProvider>
     )
   }
 }

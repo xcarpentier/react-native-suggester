@@ -1,17 +1,17 @@
-import React, { Component, RefObject, ReactNode, ReactChild } from 'react'
+import React, { Component, RefObject } from 'react'
+import PropTypes from 'prop-types'
 import {
-  Animated,
   Easing,
   StyleSheet,
   TextInput,
   TextInputProps,
+  Animated,
 } from 'react-native'
 import { SuggesterContext, SuggesterContextParam } from './SuggesterContext'
 import { DURATION } from './Constants'
-import { IData } from 'IData'
+import { IData } from './IData'
 
-interface Props {
-  children: ReactChild & { props: TextInputProps }
+interface Props extends TextInputProps {
   data: IData[]
 }
 
@@ -19,7 +19,16 @@ interface State {
   value?: string
 }
 
-export class InputFilterWrapper extends Component<Props, State> {
+export class SuggestTextInput extends Component<Props, State> {
+  static propTypes = {
+    data: PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+          .isRequired,
+        value: PropTypes.string.isRequired,
+      }).isRequired,
+    ),
+  }
   state = { value: '' }
 
   translateY = new Animated.Value(0)
@@ -37,6 +46,7 @@ export class InputFilterWrapper extends Component<Props, State> {
     setMarginTopAsync,
     handleFocusProvider,
     setDataAsync,
+    statusBarHeight,
   }: SuggesterContextParam) => async () => {
     const { data } = this.props
     const { inputY, inputHeight } = await this.measureAsync(this.textInputRef)
@@ -49,14 +59,16 @@ export class InputFilterWrapper extends Component<Props, State> {
 
     Animated.parallel([
       Animated.timing(this.translateY, {
-        toValue: -inputY, // TODO: + this.statusBarHeight,
+        toValue: -inputY + statusBarHeight! || 0,
         duration: DURATION,
         easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true,
       }),
       Animated.timing(this.opacity, {
         toValue: 1,
         duration: DURATION,
         easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true,
       }),
     ]).start()
   }
@@ -68,17 +80,19 @@ export class InputFilterWrapper extends Component<Props, State> {
         toValue: 0,
         duration: DURATION,
         easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true,
       }),
       Animated.timing(this.opacity, {
         toValue: 0,
         duration: DURATION,
         easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true,
       }),
-    ]).start()
-
-    if (this.textInputRef && this.textInputRef.current) {
-      setTimeout(this.textInputRef.current.blur, DURATION)
-    }
+    ]).start(({ finished }) => {
+      if (finished && this.textInputRef && this.textInputRef.current) {
+        setTimeout(this.textInputRef.current.blur, DURATION)
+      }
+    })
   }
 
   handleChange = (value: string) => this.setState({ value })
@@ -103,10 +117,8 @@ export class InputFilterWrapper extends Component<Props, State> {
     })
 
   render() {
-    const { children } = this.props
     const { value } = this.state
     const { translateY, opacity } = this
-    const childProps = children.props
     return (
       <SuggesterContext.Consumer>
         {({
@@ -114,6 +126,7 @@ export class InputFilterWrapper extends Component<Props, State> {
           handleFocusProvider,
           handleBlurProvider,
           setDataAsync,
+          statusBarHeight,
         }) => (
           <>
             <Animated.View
@@ -125,7 +138,7 @@ export class InputFilterWrapper extends Component<Props, State> {
             >
               <TextInput
                 autoCorrect={false}
-                {...childProps}
+                {...this.props}
                 ref={this.textInputRef}
                 value={value}
                 onChangeText={this.handleChange}
@@ -133,6 +146,7 @@ export class InputFilterWrapper extends Component<Props, State> {
                   setMarginTopAsync,
                   handleFocusProvider,
                   setDataAsync,
+                  statusBarHeight,
                 })}
                 onBlur={this.handleBlur({ handleBlurProvider })}
               />

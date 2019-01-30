@@ -6,6 +6,7 @@
 .history
 .DS_Store
 node_modules/
+example/node_modules/
 .expo/
 npm-debug.log
 lib/

@@ -1,15 +1,15 @@
 import React, { Component, ReactNode } from 'react'
 import { SuggesterContext } from './SuggesterContext'
-import { StyleSheet, Animated, Easing } from 'react-native'
+import { StyleSheet, Easing, Animated } from 'react-native'
 import { InputFilterModal } from './SuggesterModal'
-import { DURATION, HEIGHT } from './Constants'
+import { DURATION, WINDOW_HEIGHT, STATUS_BAR_HEIGHT } from './Constants'
 import { setStateAsync } from './SetStateAsync'
-import { IData } from 'IData'
+import { IData } from './IData'
 
 interface Props {
   children: ReactNode
-  statusBarHeight: number
-  backgroundColor: string
+  statusBarHeight?: number
+  backgroundColor?: string
 }
 
 interface State {
@@ -18,9 +18,9 @@ interface State {
   value: string
 }
 
-export class InputFilterProvider extends Component<Props, State> {
+export class SuggesterProvider extends Component<Props, State> {
   static defaultProps = {
-    statusBarHeight: 27,
+    statusBarHeight: STATUS_BAR_HEIGHT,
     backgroundColor: 'white',
   }
 
@@ -30,7 +30,7 @@ export class InputFilterProvider extends Component<Props, State> {
     value: '',
   }
 
-  translateY = new Animated.Value(HEIGHT)
+  translateY = new Animated.Value(WINDOW_HEIGHT)
 
   setDataAsync = (data: IData[]) =>
     setStateAsync({ component: this, state: { data } })
@@ -45,24 +45,26 @@ export class InputFilterProvider extends Component<Props, State> {
     const { marginTop } = this.state
     this.setValueAsync('')
     Animated.timing(this.translateY, {
-      toValue: marginTop + this.props.statusBarHeight,
+      toValue: marginTop + this.props.statusBarHeight!,
       duration: DURATION,
       easing: Easing.inOut(Easing.ease),
+      useNativeDriver: true,
     }).start()
   }
 
   handleBlur = () => {
     Animated.timing(this.translateY, {
-      toValue: HEIGHT,
+      toValue: WINDOW_HEIGHT,
       duration: DURATION,
       easing: Easing.inOut(Easing.ease),
+      useNativeDriver: true,
     }).start()
   }
 
   selectFromList = (value: string) => this.setValueAsync(value)
 
   render() {
-    const { children, backgroundColor } = this.props
+    const { children, backgroundColor, statusBarHeight } = this.props
     const { data, value } = this.state
     const {
       setDataAsync,
@@ -82,6 +84,7 @@ export class InputFilterProvider extends Component<Props, State> {
           setMarginTopAsync,
           handleFocusProvider,
           handleBlurProvider,
+          statusBarHeight,
         }}
       >
         {children}

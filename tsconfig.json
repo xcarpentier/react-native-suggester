@@ -7,8 +7,6 @@
     "target": "es6",
     "module": "es6",
     "moduleResolution": "node",
-    "rootDir": "src",
-    "baseUrl": "src",
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "experimentalDecorators": true,

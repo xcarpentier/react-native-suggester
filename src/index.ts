@@ -1,3 +1,3 @@
-export { InputFilterProvider } from './SuggesterProvider'
-export { InputFilterWrapper } from './SuggesterWrapper'
+export { SuggesterProvider } from './SuggesterProvider'
+export { SuggestTextInput } from './SuggestTextInput'
 export { IData } from './IData'
