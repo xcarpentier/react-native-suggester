@@ -1,40 +1,55 @@
-import React, { Component } from 'react'
-import { TextInput, Animated, Easing, Dimensions, StyleSheet } from 'react-native'
-import { InputFilterContext } from './InputFilterContext'
-import { Constants as ExpoConstants } from 'expo'
+import React, { Component, RefObject, ReactNode, ReactChild } from 'react'
+import {
+  Animated,
+  Easing,
+  StyleSheet,
+  TextInput,
+  TextInputProps,
+} from 'react-native'
+import { InputFilterContext, InputContext } from './InputFilterContext'
 import { DURATION } from './Constants'
+import { IData } from 'IData'
 
-const { width } = Dimensions.get('window')
+interface Props {
+  children: ReactChild & { props: TextInputProps }
+  data: IData[]
+}
 
-// export interface Props {}
+interface State {
+  value?: string
+}
 
-export class InputFilterWrapper extends Component {
+export class InputFilterWrapper extends Component<Props, State> {
   state = { value: '' }
 
-  constructor(props) {
-    super(props)
-    this.statusBarHeight = ExpoConstants.statusBarHeight
-  }
-
   translateY = new Animated.Value(0)
+
   opacity = new Animated.Value(0)
 
-  containerRef = undefined
+  textInputRef?: RefObject<TextInput> = undefined
 
-  setRef = ref => (this.containerRef = ref)
+  constructor(props: Props) {
+    super(props)
+    this.textInputRef = React.createRef()
+  }
 
-  handleFocus = ({ setMarginTopAsync, handleFocusProvider, setDataAsync }) => async () => {
+  handleFocus = ({
+    setMarginTopAsync,
+    handleFocusProvider,
+    setDataAsync,
+  }: InputContext) => async () => {
     const { data } = this.props
-    const { inputY, inputHeight, inputWidth } = await this.measureAsync(this.containerRef)
+    const { inputY, inputHeight } = await this.measureAsync(this.textInputRef)
 
-    await setDataAsync(data)
+    await setDataAsync!(data)
 
-    await setMarginTopAsync(inputHeight)
+    await setMarginTopAsync!(inputHeight)
 
-    handleFocusProvider()
+    handleFocusProvider!()
+
     Animated.parallel([
       Animated.timing(this.translateY, {
-        toValue: -inputY + this.statusBarHeight,
+        toValue: -inputY, // TODO: + this.statusBarHeight,
         duration: DURATION,
         easing: Easing.inOut(Easing.ease),
       }),
@@ -46,8 +61,8 @@ export class InputFilterWrapper extends Component {
     ]).start()
   }
 
-  handleBlur = ({ handleBlurProvider }) => () => {
-    handleBlurProvider()
+  handleBlur = ({ handleBlurProvider }: InputContext) => () => {
+    handleBlurProvider!()
     Animated.parallel([
       Animated.timing(this.translateY, {
         toValue: 0,
@@ -61,17 +76,23 @@ export class InputFilterWrapper extends Component {
       }),
     ]).start()
 
-    if (this.containerRef) {
-      setTimeout(this.containerRef.blur, DURATION)
+    if (this.textInputRef && this.textInputRef.current) {
+      setTimeout(this.textInputRef.current.blur, DURATION)
     }
   }
 
-  handleChange = text => this.setState({ value: text })
+  handleChange = (value: string) => this.setState({ value })
 
-  measureAsync = ref =>
+  measureAsync = (
+    ref?: RefObject<TextInput>,
+  ): Promise<{
+    inputY: number
+    inputHeight: number
+    inputWidth: number
+  }> =>
     new Promise(resolve => {
-      if (ref) {
-        ref.measure((_fx, _fy, width, height, _px, py) => {
+      if (ref && ref.current) {
+        ref.current.measure((_fx, _fy, width, height, _px, py) => {
           resolve({
             inputY: py,
             inputHeight: height,
@@ -85,11 +106,15 @@ export class InputFilterWrapper extends Component {
     const { children } = this.props
     const { value } = this.state
     const { translateY, opacity } = this
-
     const childProps = children.props
     return (
       <InputFilterContext.Consumer>
-        {({ setMarginTopAsync, handleFocusProvider, handleBlurProvider, setDataAsync }) => (
+        {({
+          setMarginTopAsync,
+          handleFocusProvider,
+          handleBlurProvider,
+          setDataAsync,
+        }) => (
           <>
             <Animated.View
               style={{
@@ -101,10 +126,14 @@ export class InputFilterWrapper extends Component {
               <TextInput
                 autoCorrect={false}
                 {...childProps}
-                ref={this.setRef}
+                ref={this.textInputRef}
                 value={value}
                 onChangeText={this.handleChange}
-                onFocus={this.handleFocus({ setMarginTopAsync, handleFocusProvider, setDataAsync })}
+                onFocus={this.handleFocus({
+                  setMarginTopAsync,
+                  handleFocusProvider,
+                  setDataAsync,
+                })}
                 onBlur={this.handleBlur({ handleBlurProvider })}
               />
             </Animated.View>

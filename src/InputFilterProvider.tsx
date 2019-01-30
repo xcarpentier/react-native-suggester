@@ -1,39 +1,43 @@
-import React, { Component } from 'react'
+import React, { Component, ReactNode } from 'react'
 import { InputFilterContext } from './InputFilterContext'
-import { StyleSheet, Animated, Dimensions, Easing } from 'react-native'
+import { StyleSheet, Animated, Easing, TextInput } from 'react-native'
 import { InputFilterModal } from './InputFilterModal'
-import { DURATION } from './Constants'
+import { DURATION, HEIGHT } from './Constants'
 import { setStateAsync } from './SetStateAsync'
 import { IData } from 'IData'
 
-const { height } = Dimensions.get('window')
-
 interface Props {
+  children: ReactNode
   statusBarHeight: number
+  backgroundColor: string
 }
 
 interface State {
-  state: IData[]
+  data: IData[]
   marginTop: number
   value: string
 }
 
 export class InputFilterProvider extends Component<Props, State> {
-  static defaultProps: Props = {
+  static defaultProps = {
     statusBarHeight: 27,
+    backgroundColor: 'white',
   }
 
   state = {
     data: [],
-    marginTop: 15,
+    marginTop: 30,
     value: '',
   }
 
-  translateY = new Animated.Value(height)
+  translateY = new Animated.Value(HEIGHT)
+
   setDataAsync = (data: IData[]) =>
     setStateAsync({ component: this, state: { data } })
+
   setValueAsync = (value: string) =>
     setStateAsync({ component: this, state: { value } })
+
   setMarginTopAsync = (marginTop: number) =>
     setStateAsync({ component: this, state: { marginTop } })
 
@@ -49,7 +53,7 @@ export class InputFilterProvider extends Component<Props, State> {
 
   handleBlur = () => {
     Animated.timing(this.translateY, {
-      toValue: height,
+      toValue: HEIGHT,
       duration: DURATION,
       easing: Easing.inOut(Easing.ease),
     }).start()
@@ -58,7 +62,7 @@ export class InputFilterProvider extends Component<Props, State> {
   selectFromList = (value: string) => this.setValueAsync(value)
 
   render() {
-    const { children } = this.props
+    const { children, backgroundColor } = this.props
     const { data, value } = this.state
     const {
       setDataAsync,
@@ -84,7 +88,7 @@ export class InputFilterProvider extends Component<Props, State> {
         <Animated.View
           style={{
             ...StyleSheet.absoluteFillObject,
-            backgroundColor: 'white',
+            backgroundColor,
             transform: [{ translateY }],
           }}
         >

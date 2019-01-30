@@ -29,6 +29,9 @@
     "react": "^16.7.0",
     "react-native": "^0.57.8"
   },
+  "dependencies": {
+    "fuse.js": "3.3.0"
+  },
   "peerDependencies": {
     "react": "*",
     "react-native": "*"
