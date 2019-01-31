@@ -220,7 +220,12 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
                   zIndex: 2000,
                 },
                 focused
-                  ? { backgroundColor }
+                  ? {
+                      backgroundColor,
+                      width: '100%',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }
                   : { backgroundColor: 'transparent' },
               ]}
             >

@@ -9,7 +9,6 @@ import {
 } from 'react-native'
 import { IData } from './IData'
 import { SuggesterEventEmitter } from './SuggesterEventEmitter'
-import { SuggesterContextParam } from './SuggesterContext'
 
 interface Props {
   data: IData[]
@@ -19,6 +18,7 @@ interface Props {
   textColor?: string
   textFont?: string
   paddingHorizontal?: number
+  paddingTop?: number
   selectFromList(name: string, value: string): void
 }
 
@@ -112,10 +112,10 @@ export class SuggesterModal extends Component<Props> {
   }
 
   render() {
-    const { data, selectFromList } = this.props
+    const { data, selectFromList, paddingTop } = this.props
     return (
       <FlatList
-        style={StyleSheet.absoluteFill}
+        style={[StyleSheet.absoluteFill, paddingTop ? { paddingTop } : {}]}
         keyExtractor={this.keyExtractor}
         renderItem={this.renderItem(selectFromList)}
         ListEmptyComponent={this.renderEmpty}
