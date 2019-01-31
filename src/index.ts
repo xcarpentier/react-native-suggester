@@ -1,3 +1,3 @@
 export { SuggesterProvider } from './SuggesterProvider'
-export { SuggestTextInput } from './SuggestTextInput'
+export { SuggestTextInput, SuggestTextInputProps } from './SuggestTextInput'
 export { IData } from './IData'

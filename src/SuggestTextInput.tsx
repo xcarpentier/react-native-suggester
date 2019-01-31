@@ -16,7 +16,7 @@ import { IData } from './IData'
 import { SuggesterEventEmitter } from './SuggesterEventEmitter'
 import { setStateAsync } from './SetStateAsync'
 
-interface Props extends TextInputProps {
+export interface SuggestTextInputProps extends TextInputProps {
   data: IData[]
   name: string
 }
@@ -25,7 +25,7 @@ interface State {
   value: string | undefined
 }
 
-export class SuggestTextInput extends Component<Props, State> {
+export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
   static propTypes = {
     name: PropTypes.string.isRequired,
     data: PropTypes.arrayOf(
@@ -47,7 +47,7 @@ export class SuggestTextInput extends Component<Props, State> {
 
   textInputRef?: RefObject<TextInput> = undefined
 
-  constructor(props: Props) {
+  constructor(props: SuggestTextInputProps) {
     super(props)
     this.textInputRef = React.createRef()
   }
