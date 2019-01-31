@@ -205,6 +205,7 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
               <Animated.View
                 style={{
                   ...StyleSheet.absoluteFillObject,
+                  width: WINDOW_WIDTH,
                   backgroundColor,
                   opacity,
                   zIndex: 1000,
@@ -221,7 +222,6 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
                 focused
                   ? {
                       backgroundColor,
-                      width: '100%',
                       justifyContent: 'center',
                       alignItems: 'center',
                     }
@@ -231,7 +231,6 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
               <TextInput
                 autoCorrect={false}
                 {...this.props}
-                style={[this.props.style, focused ? { width: '100%' } : {}]}
                 ref={this.textInputRef}
                 value={value}
                 onChangeText={this.handleChange({ setValueAsync })}

@@ -83,7 +83,13 @@ export class SuggesterModal extends Component<Props> {
   }: {
     item: IData
   }) => {
-    const { backgroundColor, textColor, textFont, currentName } = this.props
+    const {
+      backgroundColor,
+      textColor,
+      textFont,
+      currentName,
+      paddingHorizontal,
+    } = this.props
     return (
       <TouchableOpacity
         onPress={this.handleSelect({
@@ -91,7 +97,7 @@ export class SuggesterModal extends Component<Props> {
           name: currentName!,
           value: item.value,
         })}
-        style={[styles.item, { backgroundColor, paddingHorizontal: 10 }]}
+        style={[styles.item, { backgroundColor, paddingHorizontal }]}
       >
         <Text
           style={[
