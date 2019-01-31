@@ -202,12 +202,27 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
           setPaddingHorizontalAsync,
         }) => (
           <>
+            {focused && (
+              <Animated.View
+                style={{
+                  ...StyleSheet.absoluteFillObject,
+                  backgroundColor,
+                  opacity,
+                  zIndex: 1000,
+                }}
+              />
+            )}
             <Animated.View
-              style={{
-                backgroundColor,
-                transform: [{ translateY }],
-                zIndex: 2000,
-              }}
+              style={[
+                {
+                  backgroundColor,
+                  transform: [{ translateY }],
+                  zIndex: 2000,
+                },
+                focused
+                  ? { backgroundColor }
+                  : { backgroundColor: 'transparent' },
+              ]}
             >
               <TextInput
                 autoCorrect={false}
@@ -226,16 +241,6 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
                 onBlur={this.handleBlur({ handleBlurProvider })}
               />
             </Animated.View>
-            {focused && (
-              <Animated.View
-                style={{
-                  ...StyleSheet.absoluteFillObject,
-                  backgroundColor,
-                  opacity,
-                  zIndex: 1000,
-                }}
-              />
-            )}
           </>
         )}
       </SuggesterContext.Consumer>
