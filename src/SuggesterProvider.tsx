@@ -7,7 +7,7 @@ import { setStateAsync } from './SetStateAsync'
 import { IData } from './IData'
 import Fuse from 'fuse.js'
 
-interface Props {
+export interface Props {
   children: ReactNode
   statusBarHeight?: number
   backgroundColor?: string
@@ -15,6 +15,8 @@ interface Props {
   textFont?: string
   textWhenEmpty?: string
 }
+
+export type SuggesterProviderProps = Omit<Props, 'children'>
 
 interface State {
   data: IData[]
@@ -24,7 +26,10 @@ interface State {
   values: { [name: string]: string }
 }
 
-export class SuggesterProvider extends Component<Props, State> {
+export class SuggesterProvider extends Component<
+  SuggesterProviderProps,
+  State
+> {
   static defaultProps = {
     statusBarHeight: STATUS_BAR_HEIGHT,
     backgroundColor: 'white',
