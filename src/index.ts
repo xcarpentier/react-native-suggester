@@ -1,3 +1,5 @@
+export { IData } from './IData'
 export { SuggesterProvider, SuggesterProviderProps } from './SuggesterProvider'
 export { SuggestTextInput, SuggestTextInputProps } from './SuggestTextInput'
-export { IData } from './IData'
+export { SuggestOptions, setSuggestOptions } from './suggest.config'
+export { withSuggestProvider } from './withSuggestProvider'
