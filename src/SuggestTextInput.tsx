@@ -82,7 +82,6 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
   }: SuggesterContextParam) => async (
     e: NativeSyntheticEvent<TextInputFocusEventData>,
   ) => {
-    this.setState({ focused: true })
     const { onFocus } = this.props
     if (onFocus) {
       onFocus(e)
@@ -114,7 +113,9 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
         easing: Easing.inOut(Easing.ease),
         useNativeDriver: true,
       }),
-    ]).start()
+    ]).start(() => {
+      this.setState({ focused: true })
+    })
   }
 
   handleBlur = ({ handleBlurProvider }: SuggesterContextParam) => (
@@ -138,10 +139,8 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
         easing: Easing.inOut(Easing.ease),
         useNativeDriver: true,
       }),
-    ]).start(({ finished }) => {
-      if (finished) {
-        this.setState({ focused: false })
-      }
+    ]).start(() => {
+      this.setState({ focused: false })
     })
   }
 
@@ -232,6 +231,7 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
               <TextInput
                 autoCorrect={false}
                 {...this.props}
+                style={[this.props.style, focused ? { width: '100%' } : {}]}
                 ref={this.textInputRef}
                 value={value}
                 onChangeText={this.handleChange({ setValueAsync })}

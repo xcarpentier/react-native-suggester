@@ -1,7 +1,7 @@
 import { Dimensions } from 'react-native'
 import { isExpo } from './Utils'
 
-export const DURATION = 350
+export const DURATION = 300
 
 export const { height: WINDOW_HEIGHT, width: WINDOW_WIDTH } = Dimensions.get(
   'window',
