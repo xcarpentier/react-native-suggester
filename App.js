@@ -1,7 +1,8 @@
 import * as React from 'react'
-import { Text, View, StyleSheet } from 'react-native'
+import { Text, View, StyleSheet, ScrollView } from 'react-native'
 import { Constants } from 'expo'
 import { SuggesterProvider, SuggestTextInput } from './src'
+
 
 const DATA = [
   { id: 1, value: 'Honda' },
@@ -28,7 +29,7 @@ export default class App extends React.Component {
         textWhenEmpty="..."
         textFont="System"
       >
-        <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.container}>
           <Text>Hello World</Text>
           <SuggestTextInput
             placeholderTextColor="#888"
@@ -66,7 +67,7 @@ export default class App extends React.Component {
             onSubmitEditing={({ text }) => this.setState({ field3: text })}
           />
           <Text>Field value: {this.state.field3}</Text>
-        </View>
+        </ScrollView>
       </SuggesterProvider>
     )
   }

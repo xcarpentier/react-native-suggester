@@ -23,6 +23,7 @@ export interface SuggestTextInputProps extends TextInputProps {
 
 interface State {
   value: string | undefined
+  focused: boolean
 }
 
 export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
@@ -39,6 +40,7 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
 
   state = {
     value: this.props.value,
+    focused: false,
   }
 
   translateY = new Animated.Value(0)
@@ -80,6 +82,7 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
   }: SuggesterContextParam) => async (
     e: NativeSyntheticEvent<TextInputFocusEventData>,
   ) => {
+    this.setState({ focused: true })
     const { onFocus } = this.props
     if (onFocus) {
       onFocus(e)
@@ -135,7 +138,11 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
         easing: Easing.inOut(Easing.ease),
         useNativeDriver: true,
       }),
-    ]).start()
+    ]).start(({ finished }) => {
+      if (finished) {
+        this.setState({ focused: false })
+      }
+    })
   }
 
   handleChange = ({ setValueAsync }: SuggesterContextParam) => (
@@ -181,7 +188,7 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
 
   render() {
     const { translateY, opacity } = this
-    const { value } = this.state
+    const { value, focused } = this.state
     return (
       <SuggesterContext.Consumer>
         {({
@@ -219,14 +226,16 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
                 onBlur={this.handleBlur({ handleBlurProvider })}
               />
             </Animated.View>
-            <Animated.View
-              style={{
-                ...StyleSheet.absoluteFillObject,
-                backgroundColor,
-                opacity,
-                zIndex: 1000,
-              }}
-            />
+            {focused && (
+              <Animated.View
+                style={{
+                  ...StyleSheet.absoluteFillObject,
+                  backgroundColor,
+                  opacity,
+                  zIndex: 1000,
+                }}
+              />
+            )}
           </>
         )}
       </SuggesterContext.Consumer>
