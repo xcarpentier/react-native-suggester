@@ -5,14 +5,19 @@ import {
   Text,
   TouchableOpacity,
   View,
+  TextProps,
 } from 'react-native'
 import { IData } from './IData'
+import { SuggesterEventEmitter } from './SuggesterEventEmitter'
+import { SuggesterContextParam } from './SuggesterContext'
 
 interface Props {
   data: IData[]
   currentName?: string
   textWhenEmpty?: string
   backgroundColor?: string
+  textColor?: string
+  textFont?: string
   paddingHorizontal?: number
   selectFromList(name: string, value: string): void
 }
@@ -31,6 +36,17 @@ const styles = StyleSheet.create({
   },
 })
 
+const SuggesterText = ({
+  textColor,
+  textFont,
+  ...props
+}: Pick<Props, 'textColor' | 'textFont'> & TextProps) => (
+  <Text
+    style={[{ color: textColor! }, textFont ? { fontFamily: textFont } : {}]}
+    {...props}
+  />
+)
+
 export class SuggesterModal extends Component<Props> {
   static defaultProps = {
     textWhenEmpty: 'Type text, we suggest',
@@ -38,26 +54,59 @@ export class SuggesterModal extends Component<Props> {
   }
   keyExtractor = (item: { id: string | number }) => `${item.id}`
 
-  renderEmpty = () => (
-    <View
-      style={[styles.empty, { backgroundColor: this.props.backgroundColor }]}
-    >
-      <Text>{this.props.textWhenEmpty}</Text>
-    </View>
-  )
+  renderEmpty = () => {
+    const { backgroundColor, textColor, textFont } = this.props
+    return (
+      <View style={[styles.empty, { backgroundColor }]}>
+        <SuggesterText {...{ textColor, textFont }}>
+          {this.props.textWhenEmpty}
+        </SuggesterText>
+      </View>
+    )
+  }
+
+  handleSelect = ({
+    selectFromList,
+    name,
+    value,
+  }: {
+    selectFromList: Props['selectFromList']
+    name: string
+    value: string
+  }) => () => {
+    selectFromList(name, value)
+    SuggesterEventEmitter.emit(`selectFromList-${name}`, value)
+  }
 
   renderItem = (selectFromList: Props['selectFromList']) => ({
     item,
   }: {
     item: IData
   }) => {
-    const { backgroundColor, paddingHorizontal } = this.props
+    const {
+      backgroundColor,
+      paddingHorizontal,
+      textColor,
+      textFont,
+      currentName,
+    } = this.props
     return (
       <TouchableOpacity
-        onPress={() => selectFromList(this.props.currentName!, item.value)}
+        onPress={this.handleSelect({
+          selectFromList,
+          name: currentName!,
+          value: item.value,
+        })}
         style={[styles.item, { backgroundColor, paddingHorizontal }]}
       >
-        <Text>{item.value}</Text>
+        <Text
+          style={[
+            { color: textColor! },
+            textFont ? { fontFamily: textFont } : {},
+          ]}
+        >
+          {item.value}
+        </Text>
       </TouchableOpacity>
     )
   }

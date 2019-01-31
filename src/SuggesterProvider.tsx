@@ -11,6 +11,8 @@ interface Props {
   children: ReactNode
   statusBarHeight?: number
   backgroundColor?: string
+  textColor?: string
+  textFont?: string
   textWhenEmpty?: string
 }
 
@@ -26,6 +28,7 @@ export class SuggesterProvider extends Component<Props, State> {
   static defaultProps = {
     statusBarHeight: STATUS_BAR_HEIGHT,
     backgroundColor: 'white',
+    textColor: 'black',
   }
 
   state = {
@@ -100,6 +103,8 @@ export class SuggesterProvider extends Component<Props, State> {
       backgroundColor,
       statusBarHeight,
       textWhenEmpty,
+      textColor,
+      textFont,
     } = this.props
     const { values, currentName, paddingHorizontal } = this.state
     const {
@@ -141,6 +146,8 @@ export class SuggesterProvider extends Component<Props, State> {
               selectFromList,
               textWhenEmpty,
               backgroundColor,
+              textColor,
+              textFont,
               currentName,
               paddingHorizontal,
             }}

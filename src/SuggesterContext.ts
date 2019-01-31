@@ -6,6 +6,8 @@ export interface SuggesterContextParam {
   values?: { [name: string]: string }
   statusBarHeight?: number
   backgroundColor?: string
+  textColor?: string
+  textFont?: string
   setMarginTopAsync?(marginTop: number): Promise<void>
   setValueAsync?(name: string, value: string): Promise<void>
   handleFocusProvider?(): void

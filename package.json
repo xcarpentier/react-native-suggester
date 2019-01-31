@@ -26,28 +26,31 @@
     "@types/react-native": "^0.57.19",
     "babel-core": "^7.0.0-bridge.0",
     "babel-preset-expo": "^5.0.0",
+    "expo": "^32.0.0",
+    "json": "^9.0.6",
     "prettier": "1.15.3",
+    "react": "16.5.0",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz",
     "tslint": "5.12.0",
     "tslint-config-prettier": "1.17.0",
-    "typescript": "3.2.2",
-    "json": "^9.0.6",
-    "expo": "^32.0.0",
-    "react": "16.5.0",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz"
+    "typescript": "3.2.2"
   },
   "dependencies": {
     "fuse.js": "3.3.0",
-    "prop-types": "15.6.2"
+    "prop-types": "15.6.2",
+    "tiny-emitter": "2.0.2"
   },
   "peerDependencies": {
     "react": "*",
     "react-native": "*"
   },
   "scripts": {
-    "dev": "json -I -f package.json -e 'this.main=\"node_modules/expo/AppEntry.js\"' && expo r -c",
+    "config:dev": "json -I -f package.json -e 'this.main=\"node_modules/expo/AppEntry.js\"'",
+    "config:npm": "json -I -f package.json -e 'this.main=\"lib/index.js\"'",
     "build": "rm -rf lib/ && tsc",
     "lint": "tslint -p tsconfig.json",
-    "prepublish": "yarn lint && yarn build && json -I -f package.json -e 'this.main=\"lib/index.js\"'",
-    "postpublish": "json -I -f package.json -e 'this.main=\"node_modules/expo/AppEntry.js\"'"
+    "prepublishOnly": "yarn lint && yarn build && yarn config:npm",
+    "postpublish": "yarn config:dev",
+    "postinstall": "yarn config:dev"
   }
 }

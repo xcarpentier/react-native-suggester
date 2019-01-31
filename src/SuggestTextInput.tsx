@@ -8,17 +8,24 @@ import {
   Animated,
   NativeSyntheticEvent,
   TextInputFocusEventData,
+  TextInputSubmitEditingEventData,
 } from 'react-native'
 import { SuggesterContext, SuggesterContextParam } from './SuggesterContext'
 import { DURATION, WINDOW_HEIGHT, WINDOW_WIDTH } from './Constants'
 import { IData } from './IData'
+import { SuggesterEventEmitter } from './SuggesterEventEmitter'
+import { setStateAsync } from './SetStateAsync'
 
 interface Props extends TextInputProps {
   data: IData[]
   name: string
 }
 
-export class SuggestTextInput extends Component<Props> {
+interface State {
+  value: string | undefined
+}
+
+export class SuggestTextInput extends Component<Props, State> {
   static propTypes = {
     name: PropTypes.string.isRequired,
     data: PropTypes.arrayOf(
@@ -30,6 +37,10 @@ export class SuggestTextInput extends Component<Props> {
     ),
   }
 
+  state = {
+    value: this.props.value,
+  }
+
   translateY = new Animated.Value(0)
 
   opacity = new Animated.Value(0)
@@ -39,6 +50,25 @@ export class SuggestTextInput extends Component<Props> {
   constructor(props: Props) {
     super(props)
     this.textInputRef = React.createRef()
+  }
+
+  onSelect = async (value: string) => {
+    await setStateAsync({ component: this, state: { value } })
+    const { onChangeText } = this.props
+    if (onChangeText) {
+      onChangeText(value)
+    }
+    this.textInputRef!.current!.blur()
+  }
+
+  componentDidMount() {
+    const { name } = this.props
+    SuggesterEventEmitter.on(`selectFromList-${name}`, this.onSelect)
+  }
+
+  componentWillUnmount() {
+    const { name } = this.props
+    SuggesterEventEmitter.off(`selectFromList-${name}`, this.onSelect)
   }
 
   handleFocus = ({
@@ -105,11 +135,7 @@ export class SuggestTextInput extends Component<Props> {
         easing: Easing.inOut(Easing.ease),
         useNativeDriver: true,
       }),
-    ]).start(({ finished }) => {
-      if (finished && this.textInputRef && this.textInputRef.current) {
-        setTimeout(this.textInputRef.current.blur, DURATION)
-      }
-    })
+    ]).start()
   }
 
   handleChange = ({ setValueAsync }: SuggesterContextParam) => (
@@ -120,6 +146,8 @@ export class SuggestTextInput extends Component<Props> {
       onChangeText(value)
     }
     setValueAsync!(name, value)
+
+    this.setState({ value })
   }
 
   measureAsync = (
@@ -141,12 +169,22 @@ export class SuggestTextInput extends Component<Props> {
       }
     })
 
+  handleSubmit = (e: NativeSyntheticEvent<TextInputSubmitEditingEventData>) => {
+    const { onSubmitEditing, onChangeText } = this.props
+    if (onSubmitEditing) {
+      onSubmitEditing(e)
+    }
+    if (onChangeText) {
+      onChangeText(this.state.value!)
+    }
+  }
+
   render() {
     const { translateY, opacity } = this
+    const { value } = this.state
     return (
       <SuggesterContext.Consumer>
         {({
-          values,
           setMarginTopAsync,
           handleFocusProvider,
           handleBlurProvider,
@@ -161,14 +199,14 @@ export class SuggestTextInput extends Component<Props> {
               style={{
                 backgroundColor,
                 transform: [{ translateY }],
-                zIndex: 2,
+                zIndex: 2000,
               }}
             >
               <TextInput
                 autoCorrect={false}
                 {...this.props}
                 ref={this.textInputRef}
-                value={values![this.props.name]}
+                value={value}
                 onChangeText={this.handleChange({ setValueAsync })}
                 onFocus={this.handleFocus({
                   setMarginTopAsync,
@@ -177,6 +215,7 @@ export class SuggestTextInput extends Component<Props> {
                   statusBarHeight,
                   setPaddingHorizontalAsync,
                 })}
+                onSubmitEditing={this.handleSubmit}
                 onBlur={this.handleBlur({ handleBlurProvider })}
               />
             </Animated.View>
@@ -185,7 +224,7 @@ export class SuggestTextInput extends Component<Props> {
                 ...StyleSheet.absoluteFillObject,
                 backgroundColor,
                 opacity,
-                zIndex: 1,
+                zIndex: 1000,
               }}
             />
           </>

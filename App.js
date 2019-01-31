@@ -15,22 +15,57 @@ const DATA = [
 ]
 
 export default class App extends React.Component {
+  state = {
+    field1: 'not set',
+    field2: 'not set',
+    field3: 'not set',
+  }
   render() {
     return (
-      <SuggesterProvider>
+      <SuggesterProvider
+        backgroundColor="black"
+        textColor="white"
+        textWhenEmpty="..."
+        textFont="System"
+      >
         <View style={styles.container}>
           <Text>Hello World</Text>
-          <SuggestTextInput name="field1" data={DATA} style={styles.input} />
+          <SuggestTextInput
+            placeholderTextColor="#888"
+            placeholder="moto 1"
+            name="field1"
+            data={DATA}
+            style={styles.input}
+            onChangeText={text => this.setState({ field1: text })}
+          />
+          <Text>Field value: {this.state.field1}</Text>
           <Text>Hello World</Text>
           <Text>Hello World</Text>
           <Text>Hello World</Text>
           <Text>Hello World</Text>
-          <SuggestTextInput name="field2" data={DATA} style={styles.input} />
+          <SuggestTextInput
+            placeholderTextColor="#888"
+            placeholder="moto 2"
+            name="field2"
+            data={DATA}
+            style={styles.input}
+            onChangeText={text => this.setState({ field2: text })}
+          />
+          <Text>Field value: {this.state.field2}</Text>
           <Text>Hello World</Text>
           <Text>Hello World</Text>
           <Text>Hello World</Text>
           <Text>Hello World</Text>
-          <SuggestTextInput name="field3" data={DATA} style={styles.input} />
+          <SuggestTextInput
+            placeholderTextColor="#888"
+            placeholder="moto 3"
+            name="field3"
+            data={DATA}
+            style={styles.input}
+            onChangeText={text => this.setState({ field3: text })}
+            onSubmitEditing={({ text }) => this.setState({ field3: text })}
+          />
+          <Text>Field value: {this.state.field3}</Text>
         </View>
       </SuggesterProvider>
     )
@@ -49,7 +84,8 @@ const styles = StyleSheet.create({
   input: {
     width: 300,
     height: 30,
-    borderColor: '#000',
+    borderColor: '#fff',
+    color: '#fff',
     borderWidth: 1,
   },
 })
