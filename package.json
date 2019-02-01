@@ -1,6 +1,6 @@
 {
   "name": "react-native-suggester",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "React-Native package to decorate TextInput and get suggestions with good UX",
   "repository": {
     "type": "git",
