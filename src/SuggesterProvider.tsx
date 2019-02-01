@@ -24,6 +24,7 @@ interface State {
   marginTop: number
   paddingHorizontal: number
   values: { [name: string]: string }
+  focused: boolean
 }
 
 export class SuggesterProvider extends Component<
@@ -42,6 +43,7 @@ export class SuggesterProvider extends Component<
     marginTop: 30,
     paddingHorizontal: 15,
     values: {},
+    focused: false,
   }
 
   translateY = new Animated.Value(WINDOW_HEIGHT)
@@ -70,8 +72,12 @@ export class SuggesterProvider extends Component<
   setMarginTopAsync = (marginTop: number) =>
     setStateAsync({ component: this, state: { marginTop } })
 
-  handleFocus = () => {
+  handleFocus = async () => {
     const { marginTop } = this.state
+    await setStateAsync({
+      component: this,
+      state: { focused: true },
+    })
     Animated.timing(this.translateY, {
       toValue: marginTop + this.props.statusBarHeight!,
       duration: DURATION,
@@ -86,17 +92,21 @@ export class SuggesterProvider extends Component<
       duration: DURATION,
       easing: Easing.inOut(Easing.ease),
       useNativeDriver: true,
-    }).start()
+    }).start(({ finished }) => {
+      if (finished) {
+        this.setState({ focused: false })
+      }
+    })
   }
 
   selectFromList = (name: string, value: string) =>
     this.setValueAsync(name, value)
 
   getData = () => {
-    const { values, currentName } = this.state
-    return this.fuse && currentName
+    const { values, currentName, data } = this.state
+    return this.fuse && currentName && values[currentName!]
       ? this.fuse!.search(values[currentName!])
-      : []
+      : data
   }
 
   setPaddingHorizontalAsync = (paddingHorizontal: number) =>
@@ -111,7 +121,13 @@ export class SuggesterProvider extends Component<
       textColor,
       textFont,
     } = this.props
-    const { values, currentName, paddingHorizontal } = this.state
+    const {
+      values,
+      currentName,
+      paddingHorizontal,
+      focused,
+      marginTop,
+    } = this.state
     const {
       setDataAsync,
       setMarginTopAsync,
@@ -137,6 +153,20 @@ export class SuggesterProvider extends Component<
           setPaddingHorizontalAsync,
         }}
       >
+        {focused && (
+          <Animated.View
+            style={{
+              ...StyleSheet.absoluteFillObject,
+              backgroundColor,
+              bottom: undefined,
+              height: 100,
+              opacity: translateY.interpolate({
+                inputRange: [marginTop + statusBarHeight!, WINDOW_HEIGHT],
+                outputRange: [1, 0],
+              }),
+            }}
+          />
+        )}
         {children}
         <Animated.View
           style={{

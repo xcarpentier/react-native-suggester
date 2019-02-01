@@ -220,17 +220,14 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
                   zIndex: 2000,
                 },
                 focused
-                  ? {
-                      backgroundColor,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }
+                  ? { backgroundColor }
                   : { backgroundColor: 'transparent' },
               ]}
             >
               <TextInput
                 autoCorrect={false}
                 {...this.props}
+                autoFocus={false}
                 ref={this.textInputRef}
                 value={value}
                 onChangeText={this.handleChange({ setValueAsync })}
