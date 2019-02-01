@@ -121,13 +121,7 @@ export class SuggesterProvider extends Component<
       textColor,
       textFont,
     } = this.props
-    const {
-      values,
-      currentName,
-      paddingHorizontal,
-      focused,
-      marginTop,
-    } = this.state
+    const { values, currentName, paddingHorizontal, focused } = this.state
     const {
       setDataAsync,
       setMarginTopAsync,
@@ -151,27 +145,15 @@ export class SuggesterProvider extends Component<
           handleFocusProvider,
           handleBlurProvider,
           setPaddingHorizontalAsync,
+          focused,
         }}
       >
-        {focused && (
-          <Animated.View
-            style={{
-              ...StyleSheet.absoluteFillObject,
-              backgroundColor,
-              bottom: undefined,
-              height: 100,
-              opacity: translateY.interpolate({
-                inputRange: [marginTop + statusBarHeight!, WINDOW_HEIGHT],
-                outputRange: [1, 0],
-              }),
-            }}
-          />
-        )}
         {children}
         <Animated.View
           style={{
             ...StyleSheet.absoluteFillObject,
             backgroundColor,
+            zIndex: 200,
             transform: [{ translateY }],
           }}
         >

@@ -8,6 +8,7 @@ export interface SuggesterContextParam {
   backgroundColor?: string
   textColor?: string
   textFont?: string
+  focused?: boolean
   setMarginTopAsync?(marginTop: number): Promise<void>
   setValueAsync?(name: string, value: string): Promise<void>
   handleFocusProvider?(): void

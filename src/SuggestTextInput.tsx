@@ -9,9 +9,15 @@ import {
   NativeSyntheticEvent,
   TextInputFocusEventData,
   TextInputSubmitEditingEventData,
+  View,
 } from 'react-native'
 import { SuggesterContext, SuggesterContextParam } from './SuggesterContext'
-import { DURATION, WINDOW_HEIGHT, WINDOW_WIDTH } from './Constants'
+import {
+  DURATION,
+  WINDOW_HEIGHT,
+  WINDOW_WIDTH,
+  STATUS_BAR_HEIGHT,
+} from './Constants'
 import { IData } from './IData'
 import { SuggesterEventEmitter } from './SuggesterEventEmitter'
 import { setStateAsync } from './SetStateAsync'
@@ -44,8 +50,6 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
   }
 
   translateY = new Animated.Value(0)
-
-  opacity = new Animated.Value(0)
 
   textInputRef?: RefObject<TextInput> = undefined
 
@@ -99,6 +103,7 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
     await setPaddingHorizontalAsync!((WINDOW_WIDTH - inputWidth) / 2)
 
     handleFocusProvider!()
+    this.setState({ focused: true })
 
     Animated.parallel([
       Animated.timing(this.translateY, {
@@ -107,15 +112,7 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
         easing: Easing.inOut(Easing.ease),
         useNativeDriver: true,
       }),
-      Animated.timing(this.opacity, {
-        toValue: 1,
-        duration: DURATION,
-        easing: Easing.inOut(Easing.ease),
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      this.setState({ focused: true })
-    })
+    ]).start()
   }
 
   handleBlur = ({ handleBlurProvider }: SuggesterContextParam) => (
@@ -133,14 +130,10 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
         easing: Easing.inOut(Easing.ease),
         useNativeDriver: true,
       }),
-      Animated.timing(this.opacity, {
-        toValue: 0,
-        duration: DURATION,
-        easing: Easing.inOut(Easing.ease),
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      this.setState({ focused: false })
+    ]).start(({ finished }) => {
+      if (finished) {
+        this.setState({ focused: false })
+      }
     })
   }
 
@@ -186,8 +179,12 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
   }
 
   render() {
-    const { translateY, opacity } = this
+    const { translateY } = this
     const { value, focused } = this.state
+    const opacity = translateY.interpolate({
+      inputRange: [0, 1],
+      outputRange: [1, 0],
+    })
     return (
       <SuggesterContext.Consumer>
         {({
@@ -200,49 +197,53 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
           setValueAsync,
           setPaddingHorizontalAsync,
         }) => (
-          <>
+          <Animated.View
+            style={[
+              {
+                backgroundColor,
+                transform: [{ translateY }],
+                zIndex: 2000,
+              },
+              focused
+                ? {
+                    backgroundColor,
+                    opacity,
+                    width: WINDOW_WIDTH,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }
+                : { backgroundColor: 'transparent' },
+            ]}
+          >
             {focused && (
-              <Animated.View
+              <View
                 style={{
                   ...StyleSheet.absoluteFillObject,
-                  width: WINDOW_WIDTH,
+                  marginTop: -STATUS_BAR_HEIGHT,
                   backgroundColor,
-                  opacity,
-                  zIndex: 1000,
+                  height: STATUS_BAR_HEIGHT,
+                  width: WINDOW_WIDTH,
                 }}
               />
             )}
-            <Animated.View
-              style={[
-                {
-                  backgroundColor,
-                  transform: [{ translateY }],
-                  zIndex: 2000,
-                },
-                focused
-                  ? { backgroundColor }
-                  : { backgroundColor: 'transparent' },
-              ]}
-            >
-              <TextInput
-                autoCorrect={false}
-                {...this.props}
-                autoFocus={false}
-                ref={this.textInputRef}
-                value={value}
-                onChangeText={this.handleChange({ setValueAsync })}
-                onFocus={this.handleFocus({
-                  setMarginTopAsync,
-                  handleFocusProvider,
-                  setDataAsync,
-                  statusBarHeight,
-                  setPaddingHorizontalAsync,
-                })}
-                onSubmitEditing={this.handleSubmit}
-                onBlur={this.handleBlur({ handleBlurProvider })}
-              />
-            </Animated.View>
-          </>
+            <TextInput
+              autoCorrect={false}
+              {...this.props}
+              autoFocus={false}
+              ref={this.textInputRef}
+              value={value}
+              onChangeText={this.handleChange({ setValueAsync })}
+              onFocus={this.handleFocus({
+                setMarginTopAsync,
+                handleFocusProvider,
+                setDataAsync,
+                statusBarHeight,
+                setPaddingHorizontalAsync,
+              })}
+              onSubmitEditing={this.handleSubmit}
+              onBlur={this.handleBlur({ handleBlurProvider })}
+            />
+          </Animated.View>
         )}
       </SuggesterContext.Consumer>
     )

@@ -3,7 +3,6 @@ import { Text, View, StyleSheet, ScrollView } from 'react-native'
 import { Constants } from 'expo'
 import { SuggesterProvider, SuggestTextInput } from './src'
 
-
 const DATA = [
   { id: 1, value: 'Honda' },
   { id: 2, value: 'BMW' },
@@ -24,8 +23,8 @@ export default class App extends React.Component {
   render() {
     return (
       <SuggesterProvider
-        backgroundColor="black"
-        textColor="white"
+        backgroundColor="white"
+        textColor="black"
         textWhenEmpty="..."
         textFont="System"
       >
@@ -81,12 +80,12 @@ const styles = StyleSheet.create({
     paddingTop: Constants.statusBarHeight,
     backgroundColor: '#ecf0f1',
     padding: 8,
+    flexGrow: 1,
   },
   input: {
     width: 300,
     height: 30,
     borderColor: '#fff',
-    color: '#fff',
     borderWidth: 1,
   },
 })
