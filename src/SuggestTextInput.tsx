@@ -60,10 +60,18 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
 
   onSelect = async (value: string) => {
     await setStateAsync({ component: this, state: { value } })
-    const { onChangeText } = this.props
+    const { onChangeText, onSubmitEditing } = this.props
+
     if (onChangeText) {
       onChangeText(value)
     }
+
+    if (onSubmitEditing) {
+      onSubmitEditing({ nativeEvent: { text: value } } as NativeSyntheticEvent<
+        TextInputFocusEventData
+      >)
+    }
+
     this.textInputRef!.current!.blur()
   }
 

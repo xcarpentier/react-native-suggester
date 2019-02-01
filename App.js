@@ -63,7 +63,9 @@ export default class App extends React.Component {
             data={DATA}
             style={styles.input}
             onChangeText={text => this.setState({ field3: text })}
-            onSubmitEditing={({ text }) => this.setState({ field3: text })}
+            onSubmitEditing={({ nativeEvent: { text } }) =>
+              this.setState({ field3: text })
+            }
           />
           <Text>Field value: {this.state.field3}</Text>
         </ScrollView>
