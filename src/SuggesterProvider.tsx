@@ -1,6 +1,6 @@
 import React, { Component, ReactNode } from 'react'
 import { SuggesterContext } from './SuggesterContext'
-import { StyleSheet, Easing, Animated } from 'react-native'
+import { StyleSheet, Easing, Animated, View } from 'react-native'
 import { SuggesterModal } from './SuggesterModal'
 import { DURATION, WINDOW_HEIGHT, STATUS_BAR_HEIGHT } from './Constants'
 import { setStateAsync } from './SetStateAsync'
@@ -153,7 +153,7 @@ export class SuggesterProvider extends Component<
           style={{
             ...StyleSheet.absoluteFillObject,
             backgroundColor,
-            zIndex: 200,
+            zIndex: 400,
             transform: [{ translateY }],
           }}
         >

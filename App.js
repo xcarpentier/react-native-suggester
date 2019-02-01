@@ -83,11 +83,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#ecf0f1',
     padding: 8,
     flexGrow: 1,
+    borderColor: 'green',
+    borderWidth: 1,
   },
   input: {
     width: 300,
     height: 30,
-    borderColor: '#fff',
+    borderColor: 'red',
     borderWidth: 1,
   },
 })

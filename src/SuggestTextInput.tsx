@@ -30,6 +30,7 @@ export interface SuggestTextInputProps extends TextInputProps {
 interface State {
   value: string | undefined
   focused: boolean
+  inputY: number
 }
 
 export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
@@ -47,6 +48,7 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
   state = {
     value: this.props.value,
     focused: false,
+    inputY: 0,
   }
 
   translateY = new Animated.Value(0)
@@ -103,6 +105,8 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
     const { inputY, inputHeight, inputWidth } = await this.measureAsync(
       this.textInputRef,
     )
+
+    this.setState({ inputY })
 
     await setDataAsync!(name, data)
 
@@ -188,7 +192,7 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
 
   render() {
     const { translateY } = this
-    const { value, focused } = this.state
+    const { value, focused, inputY } = this.state
     const opacity = translateY.interpolate({
       inputRange: [0, 1],
       outputRange: [1, 0],
@@ -205,53 +209,56 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
           setValueAsync,
           setPaddingHorizontalAsync,
         }) => (
-          <Animated.View
-            style={[
-              {
-                backgroundColor,
-                transform: [{ translateY }],
-                zIndex: 2000,
-              },
-              focused
-                ? {
-                    backgroundColor,
-                    opacity,
-                    width: WINDOW_WIDTH,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }
-                : { backgroundColor: 'transparent' },
-            ]}
-          >
+          <>
+            <Animated.View
+              style={[
+                {
+                  backgroundColor,
+                  transform: [{ translateY }],
+                  zIndex: 2000,
+                },
+                focused
+                  ? {
+                      backgroundColor,
+                      opacity,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }
+                  : { backgroundColor: 'transparent' },
+              ]}
+            >
+              <TextInput
+                autoCorrect={false}
+                {...this.props}
+                autoFocus={false}
+                ref={this.textInputRef}
+                value={value}
+                onChangeText={this.handleChange({ setValueAsync })}
+                onFocus={this.handleFocus({
+                  setMarginTopAsync,
+                  handleFocusProvider,
+                  setDataAsync,
+                  statusBarHeight,
+                  setPaddingHorizontalAsync,
+                })}
+                onSubmitEditing={this.handleSubmit}
+                onBlur={this.handleBlur({ handleBlurProvider })}
+              />
+            </Animated.View>
             {focused && (
-              <View
+              <Animated.View
                 style={{
                   ...StyleSheet.absoluteFillObject,
-                  marginTop: -STATUS_BAR_HEIGHT,
                   backgroundColor,
-                  height: STATUS_BAR_HEIGHT,
+                  opacity,
+                  bottom: undefined,
+                  height: STATUS_BAR_HEIGHT + inputY,
                   width: WINDOW_WIDTH,
+                  zIndex: 1000,
                 }}
               />
             )}
-            <TextInput
-              autoCorrect={false}
-              {...this.props}
-              autoFocus={false}
-              ref={this.textInputRef}
-              value={value}
-              onChangeText={this.handleChange({ setValueAsync })}
-              onFocus={this.handleFocus({
-                setMarginTopAsync,
-                handleFocusProvider,
-                setDataAsync,
-                statusBarHeight,
-                setPaddingHorizontalAsync,
-              })}
-              onSubmitEditing={this.handleSubmit}
-              onBlur={this.handleBlur({ handleBlurProvider })}
-            />
-          </Animated.View>
+          </>
         )}
       </SuggesterContext.Consumer>
     )
