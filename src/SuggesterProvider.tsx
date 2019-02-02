@@ -25,6 +25,7 @@ interface State {
   marginTop: number
   paddingHorizontal: number
   values: { [name: string]: string }
+  focused: boolean
 }
 
 export class SuggesterProvider extends Component<
@@ -43,6 +44,7 @@ export class SuggesterProvider extends Component<
     marginTop: 30,
     paddingHorizontal: 15,
     values: {},
+    focused: false,
   }
 
   translateY = new Animated.Value(WINDOW_HEIGHT)
@@ -75,6 +77,12 @@ export class SuggesterProvider extends Component<
 
   handleFocus = async () => {
     const { marginTop } = this.state
+    await setStateAsync({
+      component: this,
+      state: {
+        focused: true,
+      },
+    })
     Animated.parallel([
       Animated.timing(this.translateY, {
         toValue: marginTop + this.props.statusBarHeight!,
@@ -105,7 +113,11 @@ export class SuggesterProvider extends Component<
         easing: Easing.inOut(Easing.ease),
         useNativeDriver: true,
       }),
-    ]).start()
+    ]).start(({ finished }) => {
+      if (finished) {
+        this.setState({ focused: false })
+      }
+    })
   }
 
   selectFromList = (name: string, value: string) =>
@@ -131,7 +143,13 @@ export class SuggesterProvider extends Component<
       textFont,
       textFontSize,
     } = this.props
-    const { values, currentName, paddingHorizontal, marginTop } = this.state
+    const {
+      values,
+      currentName,
+      paddingHorizontal,
+      marginTop,
+      focused,
+    } = this.state
     const {
       setDataAsync,
       setMarginTopAsync,
@@ -181,39 +199,51 @@ export class SuggesterProvider extends Component<
             }}
           />
         </Animated.View>
-        <Animated.View
-          style={{
-            ...StyleSheet.absoluteFillObject,
-            bottom: undefined,
-            height: statusBarHeight,
-            backgroundColor,
-            opacity,
-          }}
-        />
-        <Animated.View
-          style={{
-            ...StyleSheet.absoluteFillObject,
-            top: statusBarHeight,
-            bottom: undefined,
-            right: undefined,
-            height: marginTop,
-            width: paddingHorizontal,
-            backgroundColor,
-            opacity,
-          }}
-        />
-        <Animated.View
-          style={{
-            ...StyleSheet.absoluteFillObject,
-            top: statusBarHeight,
-            bottom: undefined,
-            left: undefined,
-            height: marginTop,
-            width: paddingHorizontal,
-            backgroundColor,
-            opacity,
-          }}
-        />
+        {focused && (
+          <>
+            <Animated.View
+              style={{
+                ...StyleSheet.absoluteFillObject,
+                bottom: undefined,
+                height: statusBarHeight,
+                backgroundColor,
+                opacity,
+              }}
+            />
+            <Animated.View
+              style={{
+                ...StyleSheet.absoluteFillObject,
+                top: statusBarHeight,
+                bottom: undefined,
+                right: undefined,
+                height: marginTop,
+                width: paddingHorizontal,
+                backgroundColor,
+                opacity,
+                // transform: [
+                //   {
+                //     translateY: translateY.interpolate({
+                //       inputRange: [0, 1],
+                //       outputRange: [statusBarHeight!, WINDOW_HEIGHT],
+                //     }),
+                //   },
+                // ],
+              }}
+            />
+            <Animated.View
+              style={{
+                ...StyleSheet.absoluteFillObject,
+                top: statusBarHeight,
+                bottom: undefined,
+                left: undefined,
+                height: marginTop,
+                width: paddingHorizontal,
+                backgroundColor,
+                opacity,
+              }}
+            />
+          </>
+        )}
       </SuggesterContext.Provider>
     )
   }
