@@ -1,6 +1,6 @@
 import React, { Component, ReactNode } from 'react'
 import { SuggesterContext } from './SuggesterContext'
-import { StyleSheet, Easing, Animated, View } from 'react-native'
+import { StyleSheet, Easing, Animated } from 'react-native'
 import { SuggesterModal } from './SuggesterModal'
 import { DURATION, WINDOW_HEIGHT, STATUS_BAR_HEIGHT } from './Constants'
 import { setStateAsync } from './SetStateAsync'
@@ -13,6 +13,7 @@ export interface Props {
   backgroundColor?: string
   textColor?: string
   textFont?: string
+  textFontSize?: number
   textWhenEmpty?: string
 }
 
@@ -24,7 +25,6 @@ interface State {
   marginTop: number
   paddingHorizontal: number
   values: { [name: string]: string }
-  focused: boolean
 }
 
 export class SuggesterProvider extends Component<
@@ -43,10 +43,11 @@ export class SuggesterProvider extends Component<
     marginTop: 30,
     paddingHorizontal: 15,
     values: {},
-    focused: false,
   }
 
   translateY = new Animated.Value(WINDOW_HEIGHT)
+
+  opacity = new Animated.Value(0)
 
   fuse?: Fuse<IData>
 
@@ -74,29 +75,37 @@ export class SuggesterProvider extends Component<
 
   handleFocus = async () => {
     const { marginTop } = this.state
-    await setStateAsync({
-      component: this,
-      state: { focused: true },
-    })
-    Animated.timing(this.translateY, {
-      toValue: marginTop + this.props.statusBarHeight!,
-      duration: DURATION,
-      easing: Easing.inOut(Easing.ease),
-      useNativeDriver: true,
-    }).start()
+    Animated.parallel([
+      Animated.timing(this.translateY, {
+        toValue: marginTop + this.props.statusBarHeight!,
+        duration: DURATION,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(this.opacity, {
+        toValue: 1,
+        duration: DURATION,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start()
   }
 
   handleBlur = () => {
-    Animated.timing(this.translateY, {
-      toValue: WINDOW_HEIGHT,
-      duration: DURATION,
-      easing: Easing.inOut(Easing.ease),
-      useNativeDriver: true,
-    }).start(({ finished }) => {
-      if (finished) {
-        this.setState({ focused: false })
-      }
-    })
+    Animated.parallel([
+      Animated.timing(this.translateY, {
+        toValue: WINDOW_HEIGHT,
+        duration: DURATION,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(this.opacity, {
+        toValue: 0,
+        duration: DURATION,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start()
   }
 
   selectFromList = (name: string, value: string) =>
@@ -120,17 +129,19 @@ export class SuggesterProvider extends Component<
       textWhenEmpty,
       textColor,
       textFont,
+      textFontSize,
     } = this.props
-    const { values, currentName, paddingHorizontal, focused } = this.state
+    const { values, currentName, paddingHorizontal, marginTop } = this.state
     const {
       setDataAsync,
       setMarginTopAsync,
       selectFromList,
       handleFocus: handleFocusProvider,
       handleBlur: handleBlurProvider,
-      translateY,
       setValueAsync,
       setPaddingHorizontalAsync,
+      translateY,
+      opacity,
     } = this
 
     return (
@@ -145,7 +156,6 @@ export class SuggesterProvider extends Component<
           handleFocusProvider,
           handleBlurProvider,
           setPaddingHorizontalAsync,
-          focused,
         }}
       >
         {children}
@@ -165,11 +175,45 @@ export class SuggesterProvider extends Component<
               backgroundColor,
               textColor,
               textFont,
+              textFontSize,
               currentName,
               paddingHorizontal,
             }}
           />
         </Animated.View>
+        <Animated.View
+          style={{
+            ...StyleSheet.absoluteFillObject,
+            bottom: undefined,
+            height: statusBarHeight,
+            backgroundColor,
+            opacity,
+          }}
+        />
+        <Animated.View
+          style={{
+            ...StyleSheet.absoluteFillObject,
+            top: statusBarHeight,
+            bottom: undefined,
+            right: undefined,
+            height: marginTop,
+            width: paddingHorizontal,
+            backgroundColor,
+            opacity,
+          }}
+        />
+        <Animated.View
+          style={{
+            ...StyleSheet.absoluteFillObject,
+            top: statusBarHeight,
+            bottom: undefined,
+            left: undefined,
+            height: marginTop,
+            width: paddingHorizontal,
+            backgroundColor,
+            opacity,
+          }}
+        />
       </SuggesterContext.Provider>
     )
   }

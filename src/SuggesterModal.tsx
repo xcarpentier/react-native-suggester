@@ -17,6 +17,7 @@ interface Props {
   backgroundColor?: string
   textColor?: string
   textFont?: string
+  textFontSize?: number
   paddingHorizontal?: number
   paddingTop?: number
   selectFromList(name: string, value: string): void
@@ -39,10 +40,15 @@ const styles = StyleSheet.create({
 const SuggesterText = ({
   textColor,
   textFont,
+  textFontSize,
   ...props
-}: Pick<Props, 'textColor' | 'textFont'> & TextProps) => (
+}: Pick<Props, 'textColor' | 'textFont' | 'textFontSize'> & TextProps) => (
   <Text
-    style={[{ color: textColor! }, textFont ? { fontFamily: textFont } : {}]}
+    style={[
+      { color: textColor! },
+      textFont ? { fontFamily: textFont } : {},
+      textFontSize ? { fontSize: textFontSize } : {},
+    ]}
     {...props}
   />
 )
@@ -55,10 +61,10 @@ export class SuggesterModal extends Component<Props> {
   keyExtractor = (item: { id: string | number }) => `${item.id}`
 
   renderEmpty = () => {
-    const { backgroundColor, textColor, textFont } = this.props
+    const { backgroundColor, textColor, textFont, textFontSize } = this.props
     return (
       <View style={[styles.empty, { backgroundColor }]}>
-        <SuggesterText {...{ textColor, textFont }}>
+        <SuggesterText {...{ textColor, textFont, textFontSize }}>
           {this.props.textWhenEmpty}
         </SuggesterText>
       </View>
@@ -87,6 +93,7 @@ export class SuggesterModal extends Component<Props> {
       backgroundColor,
       textColor,
       textFont,
+      textFontSize,
       currentName,
       paddingHorizontal,
     } = this.props
@@ -99,14 +106,9 @@ export class SuggesterModal extends Component<Props> {
         })}
         style={[styles.item, { backgroundColor, paddingHorizontal }]}
       >
-        <Text
-          style={[
-            { color: textColor! },
-            textFont ? { fontFamily: textFont } : {},
-          ]}
-        >
+        <SuggesterText {...{ textColor, textFont, textFontSize }}>
           {item.value}
-        </Text>
+        </SuggesterText>
       </TouchableOpacity>
     )
   }

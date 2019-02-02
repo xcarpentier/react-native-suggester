@@ -27,6 +27,7 @@ export default class App extends React.Component {
         textColor="black"
         textWhenEmpty="..."
         textFont="System"
+        textFontSize={22}
       >
         <ScrollView contentContainerStyle={styles.container}>
           <Text>Hello World</Text>
@@ -76,8 +77,8 @@ export default class App extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'flex-start',
+    flexGrow: 1,
+    justifyContent: 'space-around',
     alignItems: 'center',
     paddingTop: Constants.statusBarHeight,
     backgroundColor: '#ecf0f1',

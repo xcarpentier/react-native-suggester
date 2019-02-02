@@ -1,4 +1,17 @@
-[![NPM version](https://badge.fury.io/js/react-native-suggester.svg)](http://badge.fury.io/js/react-native-suggester)
+<p align="center" >
+   <a href="https://reactnative.gallery/xcarpentier/react-native-suggester">
+    <img alt="react-native-suggester" src="https://thumbs.gfycat.com/BlueInferiorHorseshoecrab-size_restricted.gif" width="260" height="510" />
+ </a>
+
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/react-native-suggester">
+  <img alt="npm downloads" src="https://img.shields.io/npm/dm/react-native-suggester.svg"/></a>
+  <a href="https://www.npmjs.com/package/react-native-suggester"><img alt="npm version" src="https://badge.fury.io/js/react-native-suggester.svg"/></a>
+   <a href="https://reactnative.gallery/xcarpentier/react-native-suggester"><img src="https://img.shields.io/badge/reactnative.gallery-%F0%9F%8E%AC-green.svg"/></a>
+
+</p>
 
 # react-native-suggester
 
@@ -27,6 +40,37 @@ export default class App extends React.Component {
         {/* somewhere in your app */}
         <SuggestTextInput name="field1" data={DATA} style={styles.input} />
       </SuggesterProvider>
+    )
+  }
+}
+```
+
+### With HOC
+
+```jsx
+import {
+  SuggesterProvider,
+  SuggestTextInput,
+  setSuggestOptions,
+} from 'react-native-suggester'
+
+setSuggestOptions({
+  statusBarHeight: 10,
+  backgroundColor: 'white',
+  textColor: 'black',
+  textFont: 'System',
+  textFontSize: 16,
+  textWhenEmpty: '...',
+})
+
+@SuggesterProvider
+class App extends React.Component {
+  render() {
+    return (
+      <View>
+        {/* somewhere in your app */}
+        <SuggestTextInput name="field1" data={DATA} style={styles.input} />
+      </View>
     )
   }
 }

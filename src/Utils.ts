@@ -1,5 +1,3 @@
-import { Animated } from 'react-native'
-
 declare const global: any
 
 export function isExpo() {
