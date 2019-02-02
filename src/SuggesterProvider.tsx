@@ -177,30 +177,31 @@ export class SuggesterProvider extends Component<
         }}
       >
         {children}
-        <Animated.View
-          style={{
-            ...StyleSheet.absoluteFillObject,
-            backgroundColor,
-            zIndex: 400,
-            transform: [{ translateY }],
-          }}
-        >
-          <SuggesterModal
-            {...{
-              data: this.getData(),
-              selectFromList,
-              textWhenEmpty,
-              backgroundColor,
-              textColor,
-              textFont,
-              textFontSize,
-              currentName,
-              paddingHorizontal,
-            }}
-          />
-        </Animated.View>
         {focused && (
           <>
+            <Animated.View
+              style={{
+                ...StyleSheet.absoluteFillObject,
+                backgroundColor,
+                zIndex: 400,
+                transform: [{ translateY }],
+              }}
+            >
+              <SuggesterModal
+                {...{
+                  data: this.getData(),
+                  selectFromList,
+                  textWhenEmpty,
+                  backgroundColor,
+                  textColor,
+                  textFont,
+                  textFontSize,
+                  currentName,
+                  paddingHorizontal,
+                }}
+              />
+            </Animated.View>
+
             <Animated.View
               style={{
                 ...StyleSheet.absoluteFillObject,
