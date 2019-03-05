@@ -59,6 +59,9 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
       this.state.value !== this.props.value
     ) {
       this.setState({ value: this.props.value })
+      if (this.props.onChangeText) {
+        this.props.onChangeText(this.props.value || '')
+      }
     }
   }
 
