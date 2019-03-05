@@ -53,6 +53,15 @@ export class SuggestTextInput extends Component<SuggestTextInputProps, State> {
     this.textInputRef = React.createRef()
   }
 
+  componentDidUpdate(prevProps: SuggestTextInputProps) {
+    if (
+      prevProps.value !== this.props.value &&
+      this.state.value !== this.props.value
+    ) {
+      this.setState({ value: this.props.value })
+    }
+  }
+
   onSelect = async (value: string) => {
     await setStateAsync({ component: this, state: { value } })
     const { onChangeText, onSubmitEditing } = this.props

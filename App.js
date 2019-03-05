@@ -30,7 +30,9 @@ export default class App extends React.Component {
         textFontSize={22}
       >
         <ScrollView contentContainerStyle={styles.container}>
-          <Text>Hello World</Text>
+          <Text onPress={() => this.setState({ field1: 'external set value' })}>
+            Hello World
+          </Text>
           <SuggestTextInput
             placeholderTextColor="#888"
             placeholder="moto 1"
@@ -38,6 +40,7 @@ export default class App extends React.Component {
             data={DATA}
             style={styles.input}
             onChangeText={text => this.setState({ field1: text })}
+            value={this.state.field1}
           />
           <Text>Field value: {this.state.field1}</Text>
           <Text>Hello World</Text>
