@@ -75,3 +75,5 @@ class App extends React.Component {
   }
 }
 ```
+## Hire an expert!
+Looking for a ReactNative freelance expert with more than 12 years experience? Contact me from my [website](https://xaviercarpentier.com)!
