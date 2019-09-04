@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { Text, View, StyleSheet, ScrollView } from 'react-native'
-import { Constants } from 'expo'
+import { Text, StyleSheet, ScrollView } from 'react-native'
+import Constants from 'expo-constants'
 import { SuggesterProvider, SuggestTextInput } from './src'
 
 const DATA = [

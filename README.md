@@ -10,7 +10,7 @@
   <img alt="npm downloads" src="https://img.shields.io/npm/dm/react-native-suggester.svg"/></a>
   <a href="https://www.npmjs.com/package/react-native-suggester"><img alt="npm version" src="https://badge.fury.io/js/react-native-suggester.svg"/></a>
    <a href="https://reactnative.gallery/xcarpentier/react-native-suggester"><img src="https://img.shields.io/badge/reactnative.gallery-%F0%9F%8E%AC-green.svg"/></a>
-
+  <a href="#hire-an-expert"><img src="https://img.shields.io/badge/%F0%9F%92%AA-hire%20an%20expert-brightgreen"/></a>
 </p>
 
 # react-native-suggester
@@ -75,5 +75,7 @@ class App extends React.Component {
   }
 }
 ```
+
 ## Hire an expert!
+
 Looking for a ReactNative freelance expert with more than 12 years experience? Contact me from my [website](https://xaviercarpentier.com)!
